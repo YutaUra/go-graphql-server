@@ -13,7 +13,7 @@ import (
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.CreateTodoInput) (*ent.Todo, error) {
-	todo, err := r.client.Todo.Create().SetText(input.Text).SetIsDone(false).Save(ctx)
+	todo, err := r.client.Todo.Create().SetText(input.Text).SetIsDone(false).SetOwnerID(input.UserID).Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("create Todo failed.\n%v", err)
 	}
@@ -47,6 +47,14 @@ func (r *mutationResolver) DeleteTodo(ctx context.Context, input model.DeleteTod
 	return todo, nil
 }
 
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*ent.User, error) {
+	user, err := r.client.User.Create().SetName(input.Name).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("create User failed.\n%v", err)
+	}
+	return user, nil
+}
+
 func (r *queryResolver) Todos(ctx context.Context) ([]*ent.Todo, error) {
 	todos, err := r.client.Todo.Query().All(ctx)
 	if err != nil {
@@ -55,8 +63,15 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*ent.Todo, error) {
 	return todos, nil
 }
 
-func (r *todoResolver) User(ctx context.Context, obj *ent.Todo) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *todoResolver) User(ctx context.Context, obj *ent.Todo) (*ent.User, error) {
+	user, err := obj.QueryOwner().First(ctx)
+	if err != nil {
+		if err.Error() == "ent: user not found" {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("query User failed.\n%v", err)
+	}
+	return user, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

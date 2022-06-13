@@ -6,7 +6,7 @@ type Todo {
   id: ID!
   text: String!
   isDone: Boolean!
-  user: User!
+  user: User
 }
 
 type User {
@@ -20,7 +20,7 @@ type Query {
 
 input CreateTodoInput {
   text: String!
-  userId: String!
+  userId: ID!
 }
 
 input UpdateTodoInput {
@@ -33,8 +33,13 @@ input DeleteTodoInput {
   id: ID!
 }
 
+input CreateUserInput {
+  name: String!
+}
+
 type Mutation {
   createTodo(input: CreateTodoInput!): Todo!
   updateTodo(input: UpdateTodoInput!): Todo!
   deleteTodo(input: DeleteTodoInput!): Todo!
+  createUser(input: CreateUserInput!): User!
 }

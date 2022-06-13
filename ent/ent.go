@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/YutaUra/go-graphql-server/ent/todo"
+	"github.com/YutaUra/go-graphql-server/ent/user"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -30,6 +31,7 @@ type OrderFunc func(*sql.Selector)
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		todo.Table: todo.ValidColumn,
+		user.Table: user.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/YutaUra/go-graphql-server/ent/todo"
+	"github.com/YutaUra/go-graphql-server/ent/user"
 )
 
 // TodoCreate is the builder for creating a Todo entity.
@@ -29,6 +30,25 @@ func (tc *TodoCreate) SetText(s string) *TodoCreate {
 func (tc *TodoCreate) SetIsDone(b bool) *TodoCreate {
 	tc.mutation.SetIsDone(b)
 	return tc
+}
+
+// SetOwnerID sets the "owner" edge to the User entity by ID.
+func (tc *TodoCreate) SetOwnerID(id int) *TodoCreate {
+	tc.mutation.SetOwnerID(id)
+	return tc
+}
+
+// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+func (tc *TodoCreate) SetNillableOwnerID(id *int) *TodoCreate {
+	if id != nil {
+		tc = tc.SetOwnerID(*id)
+	}
+	return tc
+}
+
+// SetOwner sets the "owner" edge to the User entity.
+func (tc *TodoCreate) SetOwner(u *User) *TodoCreate {
+	return tc.SetOwnerID(u.ID)
 }
 
 // Mutation returns the TodoMutation object of the builder.
@@ -149,6 +169,26 @@ func (tc *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
 			Column: todo.FieldIsDone,
 		})
 		_node.IsDone = value
+	}
+	if nodes := tc.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   todo.OwnerTable,
+			Columns: []string{todo.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.user_todos = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

@@ -4,7 +4,11 @@ package model
 
 type CreateTodoInput struct {
 	Text   string `json:"text"`
-	UserID string `json:"userId"`
+	UserID int    `json:"userId"`
+}
+
+type CreateUserInput struct {
+	Name string `json:"name"`
 }
 
 type DeleteTodoInput struct {
@@ -15,9 +19,4 @@ type UpdateTodoInput struct {
 	ID     int     `json:"id"`
 	Text   *string `json:"text"`
 	IsDone *bool   `json:"isDone"`
-}
-
-type User struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
 }
