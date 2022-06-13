@@ -26,7 +26,7 @@ func main() {
 
 	client, err := ent.Open(dialect.Postgres, fmt.Sprintf("host=%s user=%s dbname=%s password=%s sslmode=disable", os.Getenv("POSTGRES_HOSTNAME"), os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_DB"), os.Getenv("POSTGRES_PASSWORD")))
 	if err != nil {
-		log.Fatalf("failed connecting to mysql: %v", err)
+		log.Fatalf("failed connecting to postgres: %v", err)
 	}
 	defer client.Close()
 	if err := client.Schema.Create(context.Background()); err != nil {
